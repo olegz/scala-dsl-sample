@@ -19,7 +19,6 @@ import org.junit.Test
 import org.springframework.expression.spel.standard.SpelExpressionParser
 import org.springframework.expression.spel.SpelParserConfiguration
 import org.springframework.integration.dsl.DSL.anyComponent
-import org.springframework.integration.dsl.DSL.pollableChannelComponent
 import org.springframework.integration.dsl.builders.Channel
 import org.springframework.integration.dsl.builders.PubSubChannel
 import org.springframework.integration.dsl.builders.enrich
@@ -30,7 +29,6 @@ import org.springframework.integration.dsl.builders.poll
 import org.springframework.integration.dsl.builders.transform
 import org.springframework.integration.dsl.utils.DslUtils
 import org.springframework.integration.Message
-import org.springframework.jms.connection.CachingConnectionFactory
 import org.springframework.jms.core.JmsTemplate
 import org.springframework.jms.core.MessageCreator
 import javax.jms.Session
