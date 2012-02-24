@@ -4,8 +4,6 @@ group = 'spring.integration.scala.dsl'
 
 apply plugin: 'scala'
 apply plugin: 'maven'
-apply plugin: 'eclipse'
-apply plugin: 'idea'
 
 repositories {
     mavenCentral()
