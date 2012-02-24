@@ -1,0 +1,43 @@
+description = 'Spring Integration Scala DSL Sample'
+
+group = 'spring.integration.scala.dsl'
+
+apply plugin: 'scala'
+apply plugin: 'maven'
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+
+repositories {
+    mavenCentral()
+    maven { url 'http://repo.springsource.org/libs-milestone' }
+    maven { url 'https://repo.springsource.org/libs-snapshot' }
+    maven { url 'https://repo.springsource.org/libs-release' }
+}
+
+dependencies {
+    // Libraries needed to run the scala tools
+    scalaTools 'org.scala-lang:scala-compiler:2.9.1'
+    scalaTools 'org.scala-lang:scala-library:2.9.1'
+
+    // Libraries needed for scala api
+    //compile 'org.scala-lang:scala-library:2.9.1'
+    
+    // dependent libraries
+    compile 'org.springframework.integration:spring-integration-scala:1.0.0.BUILD-SNAPSHOT'
+    
+    // libraries only needed for test
+    testCompile "log4j:log4j:1.2.16"
+    testCompile "junit:junit:4.8.1"
+    testCompile 'com.novocode:junit-interface:0.7'
+    testCompile ("org.apache.activemq:activemq-core:5.3.0") {
+         exclude group: 'org.springframework', module: 'spring-context'
+    }
+}
+
+task wrapper(type: Wrapper) {
+    description = 'Generates gradlew[.bat] scripts'
+    gradleVersion = '1.0-milestone-8'
+    distributionUrl = 'http://repo.gradle.org/gradle/distributions-snapshots/gradle-1.0-milestone-8-20120112000036+0100-bin.zip'
+    jarFile = '.wrapper/gradle-wrapper.jar'
+}
+

@@ -1,6 +1,9 @@
 .cache
 .classpath
 .project
-.settings/
-activemq-data/
-target/
+.settings
+activemq-data
+target
+.gradle
+.wrapper
+build
