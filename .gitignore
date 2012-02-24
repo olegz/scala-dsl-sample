@@ -5,5 +5,4 @@
 activemq-data
 target
 .gradle
-.wrapper
 build

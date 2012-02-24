@@ -9,8 +9,8 @@ import java.util.concurrent.Executors
  * 
  * @author Oleg Zhurakousky
  */
-object OrderProcessingApp extends Application {
-  
+object OrderProcessingApp extends App {
+
   val validOrder = PurchaseOrder(List(
     PurchaseOrderItem("books", "Spring Integration in Action"),
     PurchaseOrderItem("books", "DSLs in Action"),
