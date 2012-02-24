@@ -39,7 +39,7 @@ import javax.jms.TextMessage
 /**
  * @author Oleg Zhurakousky
  */
-class DSLUsageDemo {
+class DSLUsageTests {
 
   @Test
   def demoSend = {
