@@ -9,9 +9,11 @@ import java.util.concurrent.Executors
  * 
  * @author Oleg Zhurakousky
  */
-object OrderProcessingApp extends Application {
-
-  val validOrder = PurchaseOrder(List(
+object OrderProcessingApp {
+ 
+  def main(args: Array[String]): Unit = {
+    
+    val validOrder = PurchaseOrder(List(
     PurchaseOrderItem("books", "Spring Integration in Action"),
     PurchaseOrderItem("books", "DSLs in Action"),
     PurchaseOrderItem("bikes", "Canyon Torque FRX")))
@@ -20,22 +22,22 @@ object OrderProcessingApp extends Application {
 
   val errorFlow = handle.using { m: Message[_] => println("Received ERROR: " + m); "ERROR processing order" }
  
-  val aggregationFlow = aggregate()
+  val aggregateOrder = aggregate()
 
-  val bikeFlow =
+  val processBikeOrder =
     handle.using { m: Message[_] => println("Processing bikes order: " + m); m } -->
-    aggregationFlow
+    aggregateOrder
 
   val orderProcessingFlow =
-      filter.using { p: PurchaseOrder => !p.items.isEmpty }.where(exceptionOnRejection = true) -->
+      filter.using{p: PurchaseOrder => !p.items.isEmpty}.where(exceptionOnRejection = true) -->
       split.using { p: PurchaseOrder => p.items } -->
       Channel.withDispatcher(taskExecutor = Executors.newCachedThreadPool) -->
       route.using { pi: PurchaseOrderItem => pi.itemType }(
         when("books") then
           handle.using { m: Message[_] => println("Processing books order: " + m); m } -->
-          aggregationFlow,
+          aggregateOrder,
         when("bikes") then
-          bikeFlow
+          processBikeOrder
       )
 
   val result = orderProcessingFlow.sendAndReceive[Any](validOrder, errorFlow = errorFlow)
@@ -48,6 +50,8 @@ object OrderProcessingApp extends Application {
 //  val result = orderProcessingFlow.sendAndReceive[Any](invalidOrder, errorFlow = eFlow)
 
   println("Result: " + result)
+    
+  }
 }
 
 
