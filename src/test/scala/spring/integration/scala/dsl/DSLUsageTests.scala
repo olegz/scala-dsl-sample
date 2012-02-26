@@ -18,7 +18,7 @@ package spring.integration.scala.dsl
 import org.junit.Test
 import org.springframework.expression.spel.standard.SpelExpressionParser
 import org.springframework.expression.spel.SpelParserConfiguration
-import org.springframework.integration.dsl.implicits._
+import org.springframework.integration.dsl.implicites._
 import org.springframework.integration.dsl.builders.Channel
 import org.springframework.integration.dsl.builders.PubSubChannel
 import org.springframework.integration.dsl.builders.enrich
@@ -33,6 +33,8 @@ import org.springframework.jms.core.JmsTemplate
 import org.springframework.jms.core.MessageCreator
 import javax.jms.Session
 import javax.jms.TextMessage
+import org.springframework.integration.dsl.builders.route
+import org.springframework.integration.dsl.builders.when
 
 /**
  * @author Oleg Zhurakousky
@@ -225,6 +227,45 @@ class DSLUsageTests {
   case class Person(var name: String = null, var age: Int = 0)
 
   class Employee(val firstName: String, val lastName: String, val age: Int)
+  
+  def payloadTypeRouter = {
+    val routedFlow =  
+      handle.using{m:Message[_] => println("Payload is of type: " + m.getPayload().getClass()); m} -->
+      route.onPayloadType(
+
+      when(classOf[String]) then 
+      	handle.using{value:String => println("String type: " + value)}
+      ,	
+      when(classOf[Int]) then 
+        handle.using{value:Int => println("Int type: " + value)}
+
+    ).where(name = "myRouter")
+    
+    routedFlow.send("Spring Integration")
+    
+    routedFlow.send(25)
+    println("done")
+  }
+  
+  def headerValueRouter = {
+    val routedFlow =  
+      handle.using{m:Message[_] => println("Payload is of type: " + m.getPayload().getClass()); m} -->
+      route.onValueOfHeader("routingHeader")(
+        when("foo") then 
+      	  handle.using{value:String => println("String type: " + value)}
+        ,	
+        when("bar") then 
+          handle.using{value:Int => println("Int type: " + value)}
+
+      ).where(name = "myRouter")
+    
+    routedFlow.send("Spring Integration", headers = Map("routingHeader" -> "foo"))
+    
+    routedFlow.send("Spring Integration", headers = Map("routingHeader" -> "bar"))
+    
+    routedFlow.send(25)
+    println("done")
+  }
 
   @Test
   def httpOutboundWithFunctionUrl = {
@@ -265,6 +306,21 @@ class DSLUsageTests {
     		handle.using{quotes:Message[_] => println("QUOTES for " + quotes.getHeaders().get("company") + " : " + quotes)}
     		
     httpFlow.send("static")
+    
+    println("done")
+  }
+  
+  @Test
+  def httpOutboundWithPOSTthenGET = {
+
+    val httpFlow = 
+    		http.POST[String]("http://posttestserver.com/post.php") -->
+            transform.using{response:String => println(response) // poor man transformer to extract URL from which the POST results are visible
+              response.substring(response.indexOf("View") + 11, response.indexOf("Post") - 1)} -->
+            http.GET[String]{url:String => url} -->
+    		handle.using{response:String => println(response)}
+    				
+    httpFlow.send("Spring Integration")
     
     println("done")
   }

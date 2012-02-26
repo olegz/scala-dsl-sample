@@ -1,5 +1,5 @@
 package spring.integration.scala.dsl
-import org.springframework.integration.dsl.implicits._
+import org.springframework.integration.dsl.implicites._
 import org.springframework.integration.dsl.builders._
 import org.springframework.integration.Message
 import java.util.concurrent.Executors
