@@ -40,16 +40,11 @@ object OrderProcessingApp {
           processBikeOrder
       )
 
-  val result = orderProcessingFlow.sendAndReceive[Any](validOrder, errorFlow = errorFlow)
-  
-  /*
-   * Un-comment the following line to see how 'invalidOrder' is processed. Invalid order will raise
-   * an exception and the flow will be re-routed to the 'errorFlow'
-   */
-  
-//  val result = orderProcessingFlow.sendAndReceive[Any](invalidOrder, errorFlow = eFlow)
-
-  println("Result: " + result)
+  val validOrderResult = orderProcessingFlow.sendAndReceive[Any](validOrder, errorFlow = errorFlow)
+  println("Result: " + validOrderResult)
+ 
+  val invalidOrderResult = orderProcessingFlow.sendAndReceive[Any](invalidOrder, errorFlow = errorFlow)
+  println("Result: " + invalidOrderResult)
     
   }
 }
