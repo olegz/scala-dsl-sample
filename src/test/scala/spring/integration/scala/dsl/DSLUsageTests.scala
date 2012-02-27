@@ -72,21 +72,6 @@ class DSLUsageTests {
     messageFlow.send("hello")
     println("done")
   }
-  
-  @Test
-  def demoSendWithExplicitPubSubChannelMultipleSubscriber = {
-    val messageFlow =
-      PubSubChannel("direct") --< (
-	      transform.using { m: Message[String] => m.getPayload().toUpperCase() } -->
-	      handle.using { m: Message[_] => println("Subscriber-1 - " + m) }
-	      ,
-	      transform.using { m: Message[String] => m.getPayload().toUpperCase() } -->
-	      handle.using { m: Message[_] => println("Subscriber-2 - " + m) }
-      )
-
-    messageFlow.send("hello")
-    println("done")
-  }
 
   @Test
   def sdemoSendAndReceive = {
@@ -99,12 +84,13 @@ class DSLUsageTests {
   }
 
   @Test
-  def demoSendWithPubSubChannel = {
+  def demoSendWithExplicitPubSubChannelMultipleSubscriber = {
     val messageFlow =
       transform.using { m: Message[String] => m.getPayload().toUpperCase() }.where(name="myTransformer") -->
         PubSubChannel("pubSub") --< (
           transform.using { m: Message[_] => m.getPayload() + " - subscriber-1" } -->
-          handle.using { m: Message[_] => println(m) },
+          handle.using { m: Message[_] => println(m) }
+          ,
           transform.using { m: Message[_] => m.getPayload() + " - subscriber-2" } -->
           handle.using { m: Message[_] => println(m) })
 
@@ -118,8 +104,8 @@ class DSLUsageTests {
   def demoSendWithBridge = {
     val messageFlow =
       Channel("A") -->
-        Channel("B") -->
-        handle.using { m: Message[_] => println("From Hello channel - " + m) }
+      Channel("B") -->
+      handle.using { m: Message[_] => println("From Hello channel - " + m) }
 
     messageFlow.send("hello")
 
@@ -130,8 +116,8 @@ class DSLUsageTests {
   def demoSendWithPolingBridge = {
     val messageFlow =
       Channel("A") -->
-        Channel("B").withQueue --> poll.usingFixedRate(1) -->
-        handle.using { m: Message[_] => println("From Hello channel - " + m) }
+      Channel("B").withQueue --> poll.usingFixedRate(1) -->
+      handle.using { m: Message[_] => println("From Hello channel - " + m) }
 
     messageFlow.send("hello")
     Thread.sleep(1000)
@@ -140,35 +126,50 @@ class DSLUsageTests {
 
   @Test
   def headerEnricherWithTuple = {
-    val enricherA = enrich.header("hello" -> "bye") --> handle.using { m: Message[_] => println(m) }
+    val enricherA = 
+      enrich.header("hello" -> "bye") --> 
+      handle.using { m: Message[_] => println(m) }
+      
     enricherA.send("Hello")
     println("done")
   }
 
   @Test
   def headerEnricherWithFunctionAsValue = {
-    val enricherB = enrich.header("hello" -> Some({ m: Message[String] => m.getPayload().toUpperCase() })) --> handle.using { m: Message[_] => println(m) }
+    val enricherB = 
+      enrich.header("hello" -> Some({ m: Message[String] => m.getPayload().toUpperCase() })) --> 
+      handle.using { m: Message[_] => println(m) }
+      
     enricherB.send("Hello")
     println("done")
   }
 
   @Test
   def headerEnricherWithMessageFunctionAsProcessor = {
-    val enricherB = enrich.header("hello" -> { m: Message[String] => m.getPayload().toUpperCase() }) --> handle.using { m: Message[_] => println(m) }
+    val enricherB = 
+      enrich.header("hello" -> { m: Message[String] => m.getPayload().toUpperCase() }) --> 
+      handle.using { m: Message[_] => println(m) }
+      
     enricherB.send("Hello")
     println("done")
   }
 
   @Test
   def headerEnricherWithStringA = {
-    val enricherB = enrich.header("hello" -> { "boo" + "bar" }) --> handle.using { m: Message[_] => println(m) }
+    val enricherB = 
+      enrich.header("hello" -> { "boo" + "bar" }) --> 
+      handle.using { m: Message[_] => println(m) }
+      
     enricherB.send("Hello")
     println("done")
   }
 
   @Test
   def headerEnricherWithStringB = {
-    val enricherB = enrich.header("hello" -> "foo") --> handle.using { m: Message[_] => println(m) }
+    val enricherB = 
+      enrich.header("hello" -> "foo") --> 
+      handle.using { m: Message[_] => println(m) }
+      
     enricherB.send("Hello")
     println("done")
   }
@@ -176,7 +177,10 @@ class DSLUsageTests {
   @Test
   def headerEnricherWithExpression = {
     val expression = new SpelExpressionParser(new SpelParserConfiguration(true, true)).parseExpression("(2 * 6) + ' days of Christmas'");
-    val enricherB = enrich.header("phrase" -> expression) --> handle.using { m: Message[_] => println(m) }
+    val enricherB = 
+      enrich.header("phrase" -> expression) --> 
+      handle.using { m: Message[_] => println(m) }
+      
     enricherB.send("Hello")
     println("done")
   }
@@ -199,7 +203,7 @@ class DSLUsageTests {
     val employee = new Employee("John", "Doe", 23)
     val enricher =
       enrich { p: Person => p.name = employee.firstName + " " + employee.lastName; p.age = employee.age; p } -->
-        handle.using { m: Message[_] => println(m) }
+      handle.using { m: Message[_] => println(m) }
 
     enricher.send(new Person)
     println("done")
@@ -232,14 +236,12 @@ class DSLUsageTests {
     val routedFlow =  
       handle.using{m:Message[_] => println("Payload is of type: " + m.getPayload().getClass()); m} -->
       route.onPayloadType(
-
-      when(classOf[String]) then 
-      	handle.using{value:String => println("String type: " + value)}
-      ,	
-      when(classOf[Int]) then 
-        handle.using{value:Int => println("Int type: " + value)}
-
-    ).where(name = "myRouter")
+        when(classOf[String]) then 
+      	  handle.using{value:String => println("String type: " + value)}
+        ,	
+        when(classOf[Int]) then 
+          handle.using{value:Int => println("Int type: " + value)}
+      ).where(name = "myRouter")
     
     routedFlow.send("Spring Integration")
     
