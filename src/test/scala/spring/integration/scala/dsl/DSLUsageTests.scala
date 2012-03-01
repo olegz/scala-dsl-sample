@@ -18,23 +18,13 @@ package spring.integration.scala.dsl
 import org.junit.Test
 import org.springframework.expression.spel.standard.SpelExpressionParser
 import org.springframework.expression.spel.SpelParserConfiguration
-import org.springframework.integration.dsl.implicites._
-import org.springframework.integration.dsl.builders.Channel
-import org.springframework.integration.dsl.builders.PubSubChannel
-import org.springframework.integration.dsl.builders.enrich
-import org.springframework.integration.dsl.builders.handle
-import org.springframework.integration.dsl.builders.http
-import org.springframework.integration.dsl.builders.jms
-import org.springframework.integration.dsl.builders.poll
-import org.springframework.integration.dsl.builders.transform
 import org.springframework.integration.dsl.utils.DslUtils
 import org.springframework.integration.Message
 import org.springframework.jms.core.JmsTemplate
 import org.springframework.jms.core.MessageCreator
 import javax.jms.Session
 import javax.jms.TextMessage
-import org.springframework.integration.dsl.builders.route
-import org.springframework.integration.dsl.builders.when
+import org.springframework.integration.dsl._
 
 /**
  * @author Oleg Zhurakousky
@@ -43,6 +33,8 @@ class DSLUsageTests {
 
   @Test
   def demoSend = {
+    //Channel("").getContext()
+    
     val messageFlow =
       transform.using { m: Message[String] => m.getPayload().toUpperCase() } -->
       handle.using { m: Message[_] => println(m) }
@@ -87,15 +79,13 @@ class DSLUsageTests {
   def demoSendWithExplicitPubSubChannelMultipleSubscriber = {
     val messageFlow =
       transform.using { m: Message[String] => m.getPayload().toUpperCase() }.where(name="myTransformer") -->
-        PubSubChannel("pubSub") --< (
+        PubSubChannel("pubSub") --> (
           transform.using { m: Message[_] => m.getPayload() + " - subscriber-1" } -->
           handle.using { m: Message[_] => println(m) }
           ,
           transform.using { m: Message[_] => m.getPayload() + " - subscriber-2" } -->
           handle.using { m: Message[_] => println(m) })
-
-    println(messageFlow)
-    println(DslUtils.toProductList(messageFlow))      
+    
     messageFlow.send("hello")
     println("done")
   }
