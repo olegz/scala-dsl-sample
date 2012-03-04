@@ -23,7 +23,7 @@ dependencies {
     //compile 'org.scala-lang:scala-library:2.9.1'
     
     // dependent libraries
-    compile 'org.springframework.integration:spring-integration-scala:1.0.0.BUILD-SNAPSHOT'
+    compile 'org.springframework.integration:spring-integration-scala:1.0.0.M1'
     
     // libraries only needed for test
     testCompile "log4j:log4j:1.2.16"
