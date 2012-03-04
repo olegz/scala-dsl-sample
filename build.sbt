@@ -12,7 +12,7 @@ resolvers += "Spring Snapshot Repository" at "https://repo.springsource.org/libs
 
 resolvers += "Spring Release Repository" at "https://repo.springsource.org/libs-release"
 
-libraryDependencies += "org.springframework.integration" % "spring-integration-scala" % "1.0.0.BUILD-SNAPSHOT"
+libraryDependencies += "org.springframework.integration" % "spring-integration-scala" % "1.0.0.M1"
 
 libraryDependencies += "com.novocode" % "junit-interface" % "0.7" % "test->default"
 
