@@ -29,12 +29,11 @@ import org.springframework.integration.dsl._
 /**
  * @author Oleg Zhurakousky
  */
-class DSLUsageTests {
+class DSLUsageDemoTests {
 
   @Test
   def demoSend = {
-    //Channel("").getContext()
-    
+   
     val messageFlow =
       transform.using { m: Message[String] => m.getPayload().toUpperCase() } -->
       handle.using { m: Message[_] => println(m) }
@@ -66,10 +65,10 @@ class DSLUsageTests {
   }
 
   @Test
-  def sdemoSendAndReceive = {
+  def demoSendAndReceive = {
     val messageFlow =
       transform.using { m: Message[String] => m.getPayload().toUpperCase() } -->
-        handle.using { m: Message[_] => println(m); m }
+      handle.using { m: Message[_] => println(m); m }
 
     val reply = messageFlow.sendAndReceive[String]("hello")
     println(reply)
@@ -79,19 +78,20 @@ class DSLUsageTests {
   def demoSendWithExplicitPubSubChannelMultipleSubscriber = {
     val messageFlow =
       transform.using { m: Message[String] => m.getPayload().toUpperCase() }.where(name="myTransformer") -->
-        PubSubChannel("pubSub") --> (
+      PubSubChannel("pubSub") --> (
           transform.using { m: Message[_] => m.getPayload() + " - subscriber-1" } -->
           handle.using { m: Message[_] => println(m) }
           ,
           transform.using { m: Message[_] => m.getPayload() + " - subscriber-2" } -->
-          handle.using { m: Message[_] => println(m) })
+          handle.using { m: Message[_] => println(m) }
+      )
     
     messageFlow.send("hello")
     println("done")
   }
 
   @Test
-  def demoSendWithBridge = {
+  def demoSendWithMessagingBridge = {
     val messageFlow =
       Channel("A") -->
       Channel("B") -->
@@ -103,7 +103,7 @@ class DSLUsageTests {
   }
 
   @Test
-  def demoSendWithPolingBridge = {
+  def demoSendWithPolingMessagingBridge = {
     val messageFlow =
       Channel("A") -->
       Channel("B").withQueue --> poll.usingFixedRate(1) -->
@@ -115,7 +115,7 @@ class DSLUsageTests {
   }
 
   @Test
-  def headerEnricherWithTuple = {
+  def demoSendWithHeaderEnricherWithTuple = {
     val enricherA = 
       enrich.header("hello" -> "bye") --> 
       handle.using { m: Message[_] => println(m) }
@@ -125,7 +125,7 @@ class DSLUsageTests {
   }
 
   @Test
-  def headerEnricherWithFunctionAsValue = {
+  def demoSendWithHeaderEnricherWithFunctionAsValue = {
     val enricherB = 
       enrich.header("hello" -> Some({ m: Message[String] => m.getPayload().toUpperCase() })) --> 
       handle.using { m: Message[_] => println(m) }
@@ -135,7 +135,7 @@ class DSLUsageTests {
   }
 
   @Test
-  def headerEnricherWithMessageFunctionAsProcessor = {
+  def demoSendWithHeaderEnricherWithMessageFunctionAsProcessor = {
     val enricherB = 
       enrich.header("hello" -> { m: Message[String] => m.getPayload().toUpperCase() }) --> 
       handle.using { m: Message[_] => println(m) }
@@ -145,27 +145,17 @@ class DSLUsageTests {
   }
 
   @Test
-  def headerEnricherWithStringA = {
-    val enricherB = 
-      enrich.header("hello" -> { "boo" + "bar" }) --> 
-      handle.using { m: Message[_] => println(m) }
-      
-    enricherB.send("Hello")
-    println("done")
-  }
-
-  @Test
-  def headerEnricherWithStringB = {
-    val enricherB = 
+  def demoSendWithHeaderEnricherWithStaticValue = {
+    val enricher = 
       enrich.header("hello" -> "foo") --> 
       handle.using { m: Message[_] => println(m) }
       
-    enricherB.send("Hello")
+    enricher.send("Hello")
     println("done")
   }
 
   @Test
-  def headerEnricherWithExpression = {
+  def demoSendWithHeaderEnricherWithSpELExpression = {
     val expression = new SpelExpressionParser(new SpelParserConfiguration(true, true)).parseExpression("(2 * 6) + ' days of Christmas'");
     val enricherB = 
       enrich.header("phrase" -> expression) --> 
@@ -176,7 +166,7 @@ class DSLUsageTests {
   }
 
   @Test
-  def headerEnricherWithMultiTuple = {
+  def demoSendWithHeaderEnricherWithMultiTuple = {
     val expression = new SpelExpressionParser(new SpelParserConfiguration(true, true)).parseExpression("(2 * 6) + ' days of Christmas'");
     val enricher =
       enrich.headers("foo" -> "foo",
@@ -189,7 +179,7 @@ class DSLUsageTests {
   }
 
   @Test
-  def contentEnricher = {
+  def demoSendWithContentEnricher = {
     val employee = new Employee("John", "Doe", 23)
     val enricher =
       enrich { p: Person => p.name = employee.firstName + " " + employee.lastName; p.age = employee.age; p } -->
@@ -200,7 +190,7 @@ class DSLUsageTests {
   }
 
   @Test
-  def contentEnricherWithSubFlow = {
+  def demoSendWithContentEnricherWithSubFlow = {
 
     val employeeBuldingFlow =
       transform.using { attributes: List[String] => new Employee(attributes(0), attributes(1), Integer.parseInt(attributes(2))) }
@@ -222,7 +212,8 @@ class DSLUsageTests {
 
   class Employee(val firstName: String, val lastName: String, val age: Int)
   
-  def payloadTypeRouter = {
+  @Test
+  def demoSendWithPayloadTypeRouter = {
     val routedFlow =  
       handle.using{m:Message[_] => println("Payload is of type: " + m.getPayload().getClass()); m} -->
       route.onPayloadType(
@@ -239,7 +230,7 @@ class DSLUsageTests {
     println("done")
   }
   
-  def headerValueRouter = {
+  def demoSendWithHeaderValueRouter = {
     val routedFlow =  
       handle.using{m:Message[_] => println("Payload is of type: " + m.getPayload().getClass()); m} -->
       route.onValueOfHeader("routingHeader")(
@@ -260,7 +251,7 @@ class DSLUsageTests {
   }
 
   @Test
-  def httpOutboundWithFunctionUrl = {
+  def demoSendWithHttpOutboundGatewayWithFunctionUrl = {
 
     val tickerService =
       transform.using { s: String =>
@@ -282,7 +273,7 @@ class DSLUsageTests {
   }
   
   @Test
-  def httpOutboundWithStringUrl = {
+  def demoSendWithHttpOutboundGatewayWithStringUrl = {
 
     val tickerService =
       transform.using { s: String =>
@@ -303,7 +294,7 @@ class DSLUsageTests {
   }
   
   @Test
-  def httpOutboundWithPOSTthenGET = {
+  def demoSendWithHttpOutboundGatewayWithPOSTthenGET = {
 
     val httpFlow = 
     		http.POST[String]("http://posttestserver.com/post.php") -->
@@ -318,7 +309,7 @@ class DSLUsageTests {
   }
   
   @Test
-  def jmsInboundGateway  = {
+  def demoListenOnJmsInboundGateway  = {
     val connectionFactory = JmsDslTestUtils.localConnectionFactory
     
     val flow = 

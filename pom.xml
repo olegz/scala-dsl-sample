@@ -5,6 +5,10 @@
 	<artifactId>scala-dsl-sample</artifactId>
 	<version>1.0</version>
 
+	<prerequisites>
+		<maven>2.2.1</maven>
+	</prerequisites>
+
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.integration</groupId>
