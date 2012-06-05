@@ -4,15 +4,15 @@ version := "1.0"
 
 organization := "spring.integration.scala.dsl"
 
-scalaVersion := "2.9.1"
+scalaVersion := "2.9.2"
 
 resolvers += "Spring Milestone Repository" at "http://repo.springsource.org/libs-milestone"
 
-resolvers += "Spring Snapshot Repository" at "https://repo.springsource.org/libs-snapshot"
+libraryDependencies += "org.springframework.integration" % "spring-integration-dsl-scala-core" % "1.0.0.M2"
 
-resolvers += "Spring Release Repository" at "https://repo.springsource.org/libs-release"
+libraryDependencies += "org.springframework.integration" % "spring-integration-dsl-scala-jms" % "1.0.0.M2"
 
-libraryDependencies += "org.springframework.integration" % "spring-integration-scala" % "1.0.0.M1"
+libraryDependencies += "org.springframework.integration" % "spring-integration-dsl-scala-http" % "1.0.0.M2"
 
 libraryDependencies += "com.novocode" % "junit-interface" % "0.7" % "test->default"
 

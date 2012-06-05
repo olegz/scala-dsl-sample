@@ -4,26 +4,27 @@ group = 'spring.integration.scala.dsl'
 
 apply plugin: 'scala'
 apply plugin: 'maven'
-sourceCompatibility=1.5
-targetCompatibility=1.5
+apply plugin: 'eclipse'
+apply plugin: 'idea'
+sourceCompatibility=1.6
+targetCompatibility=1.6
 
 repositories {
-    mavenCentral()
     maven { url 'https://repo.springsource.org/libs-milestone' }
-    maven { url 'https://repo.springsource.org/libs-snapshot' }
-    maven { url 'https://repo.springsource.org/libs-release' }
 }
 
 dependencies {
     // Libraries needed to run the scala tools
-    scalaTools 'org.scala-lang:scala-compiler:2.9.1'
-    scalaTools 'org.scala-lang:scala-library:2.9.1'
+    scalaTools 'org.scala-lang:scala-compiler:2.9.2'
+    scalaTools 'org.scala-lang:scala-library:2.9.2'
 
     // Libraries needed for scala api
-    //compile 'org.scala-lang:scala-library:2.9.1'
+    //compile 'org.scala-lang:scala-library:2.9.2'
     
     // dependent libraries
-    compile 'org.springframework.integration:spring-integration-scala:1.0.0.M1'
+    compile "org.springframework.integration:spring-integration-dsl-scala-core:1.0.0.M2"
+    compile "org.springframework.integration:spring-integration-dsl-scala-jms:1.0.0.M2"
+    compile "org.springframework.integration:spring-integration-dsl-scala-http:1.0.0.M2"
     
     // libraries only needed for test
     testCompile "log4j:log4j:1.2.16"
@@ -33,15 +34,6 @@ dependencies {
          exclude group: 'org.springframework', module: 'spring-context'
     }
 }
-
-task sourcesJar(type: Jar) {
-    classifier = 'sources'
-}
-
-artifacts {
-    archives sourcesJar
-}
-
 
 task wrapper(type: Wrapper) {
     description = 'Generates gradlew[.bat] scripts'

@@ -8,5 +8,5 @@ samples organized as JUnit test and are all run during the build process while O
 application which you'll be able to execute separately. 
 
 For more details on how to check-out, build and import the project into your favorite IDE please follow 
-the [Getting Started](https://github.com/SpringSource/spring-integration-scala/wiki/Getting-Started) guide 
-of [Spring Integration Scala DSL](https://github.com/SpringSource/spring-integration-scala/wiki)
+the [Getting Started](https://github.com/SpringSource/spring-integration-dsl-scala/wiki/Getting-Started) guide 
+of [Spring Integration Scala DSL](https://github.com/SpringSource/spring-integration-dsl-scala/wiki)
